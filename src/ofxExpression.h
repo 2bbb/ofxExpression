@@ -83,7 +83,7 @@ public:
     }
     
     bool isUnaryOp(const string &command) const {
-        return command == "sin" || command == "cos" || command == "tan";
+        return command == "sin" || command == "cos" || command == "tan" || command == "asin" || command == "acos" || command == "atan" || command == "log";
     }
     
     Expr_ unaryOp(const string &op, Expr_ arg) {
@@ -99,28 +99,44 @@ public:
         if(op == "tan") {
             return Expr_(new Tan(arg));
         }
+        if(op == "asin") {
+            return Expr_(new Asin(arg));
+        }
+        if(op == "acos") {
+            return Expr_(new Acos(arg));
+        }
+        if(op == "atan") {
+            return Expr_(new Atan(arg));
+        }
+        if(op == "log") {
+            return Expr_(new Log(arg));
+        }
         
         return Expr_();
     }
     
     bool isBinaryOp(const string &command) const {
-        return command == "+" || command == "-" || command == "*" || command == "/" || command == "pow";
+        return command == "+" || command == "add"
+            || command == "-" || command == "sub"
+            || command == "*" || command == "mul"
+            || command == "/" || command == "div"
+            || command == "pow";
     }
     
     Expr_ binaryOp(const string &op, Expr_ arg1, Expr_ arg2) {
         if(!(static_cast<bool>(arg1) && static_cast<bool>(arg2))) {
             return Expr_();
         }
-        if(op == "+") {
+        if(op == "+" || op == "add") {
             return Expr_(new Add(arg1, arg2));
         }
-        if(op == "-") {
+        if(op == "-" || op == "sub") {
             return Expr_(new Sub(arg1, arg2));
         }
-        if(op == "*") {
+        if(op == "*" || op == "mul") {
             return Expr_(new Mul(arg1, arg2));
         }
-        if(op == "/") {
+        if(op == "/" || op == "div") {
             return Expr_(new Div(arg1, arg2));
         }
         if(op == "pow") {
