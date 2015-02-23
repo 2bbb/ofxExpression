@@ -149,11 +149,11 @@ public:
         string dotTrashed = command;
         ofStringReplace(dotTrashed, ".", "");
         if(1 < command.length() - dotTrashed.length()) {
-            return parseError("many . appeared.");
+            return parseError(command + " : many . appeared.");
         }
         const char *s = dotTrashed.c_str();
         while(*s != '\0') {
-            if(!isdigit(*s++)) return parseError(command + " is not numeric string.");
+            if(!isdigit(*s++)) return parseError(command + " : is not numeric string.");
         }
         
         return Expr_(new Constant(ofToFloat(command)));
@@ -161,7 +161,7 @@ public:
     
     Expr_ parsePN(queue<string> &commands) {
         if(commands.size() == 0) {
-            expression = parseError("command is finished before finish parsing");
+            return expression = parseError("command is finished before complete parsing");
         }
         const string &command = commands.front();
         commands.pop();
@@ -176,6 +176,9 @@ public:
             expression = variable(command);
         } else {
             expression = constant(command);
+        }
+        if(!expression) {
+            ofLogError("ofxExpression") << (command + " : unknown command");
         }
         return expression;
     }
