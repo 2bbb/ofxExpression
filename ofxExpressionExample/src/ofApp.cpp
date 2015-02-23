@@ -9,11 +9,38 @@ void ofApp::setup(){
     ofLogNotice() << expr.eval(1, 2, 3);
     
     expr.parsePN("sin x");
+    
+    receiver.setup(9005);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+    while (receiver.hasWaitingMessages()) {
+        ofxOscMessage m;
+        receiver.getNextMessage(&m);
+        if(m.getAddress() == "/expr") {
+            string command = "";
+            for(int i = 0; i < m.getNumArgs(); i++) {
+                switch (m.getArgType(i)) {
+                    case OFXOSC_TYPE_STRING:
+                        command += m.getArgAsString(i);
+                        command += " ";
+                        break;
+                    case OFXOSC_TYPE_FLOAT:
+                        command += ofToString(m.getArgAsFloat(i));
+                        command += " ";
+                        break;
+                    case OFXOSC_TYPE_INT32:
+                        command += ofToString(m.getArgAsInt32(i));
+                        command += " ";
+                        break;
+                    default:
+                        break;
+                }
+            }
+            expr.parsePN(command);
+        }
+    }
 }
 
 //--------------------------------------------------------------

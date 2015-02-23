@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxExpression.h"
+#include "ofxOsc.h"
 
 class ofApp : public ofBaseApp{
 public:
@@ -22,4 +23,5 @@ public:
 private:
     ofxExpression expr;
     ofEasyCam cam;
+    ofxOscReceiver receiver;
 };
