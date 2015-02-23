@@ -77,6 +77,7 @@ un_op(Tan, tanf(_1));
 un_op(Asin, asinf(_1));
 un_op(Acos, acosf(_1));
 un_op(Atan, atanf(_1));
+un_op(Abs, fabsf(_1));
 un_op(Log, logf(_1));
 
 #undef un_op

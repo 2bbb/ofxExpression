@@ -83,7 +83,7 @@ public:
     }
     
     bool isUnaryOp(const string &command) const {
-        return command == "sin" || command == "cos" || command == "tan" || command == "asin" || command == "acos" || command == "atan" || command == "log";
+        return command == "sin" || command == "cos" || command == "tan" || command == "asin" || command == "acos" || command == "atan" || command == "abs" || command == "log";
     }
     
     Expr_ unaryOp(const string &op, Expr_ arg) {
@@ -107,6 +107,9 @@ public:
         }
         if(op == "atan") {
             return Expr_(new Atan(arg));
+        }
+        if(op == "abs") {
+            return Expr_(new Abs(arg));
         }
         if(op == "log") {
             return Expr_(new Log(arg));
