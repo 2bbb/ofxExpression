@@ -152,6 +152,10 @@ public:
             return parseError(command + " : many . appeared.");
         }
         const char *s = dotTrashed.c_str();
+        if(!isdigit(*s) && *s != '-') {
+            return parseError(command + " : is not numeric string.");
+        }
+        s++;
         while(*s != '\0') {
             if(!isdigit(*s++)) return parseError(command + " : is not numeric string.");
         }
