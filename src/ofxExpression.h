@@ -43,17 +43,13 @@ public:
         return static_cast<bool>(expression);
     }
 
-    static bool isEmpty(string str) {
-        return str.length() == 0;
-    }
-    
-    bool isNumber(const string &str) {
-        
-    }
-    
     Expr_ parseError(const string &error) {
         ofLogError("ofxExpression") << error;
         return Expr_();
+    }
+    
+    static bool isEmpty(string str) {
+        return str.length() == 0;
     }
     
     Expr_ parsePN(string expr) {
@@ -63,90 +59,100 @@ public:
         for(const string &command : splitted) {
             commands.push(command);
         }
-        return expression = parsePN(commands);
+        return expression = parsePN_impl(commands);
     }
     
-    bool isVariable(const string &command) const {
-        return command == "x" || command == "y" || command == "z";
+    Expr_ parsePN_impl(queue<string> &commands) {
+        if(commands.size() == 0) {
+            return expression = parseError("command is finished before complete parsing");
+        }
+        const string &command = commands.front();
+        commands.pop();
+        if(isBinaryOp(command)) {
+            Expr_ arg1 = parsePN_impl(commands);
+            Expr_ arg2 = parsePN_impl(commands);
+            expression = binaryOp(command, arg1, arg2);
+        } else if(isUnaryOp(command)) {
+            Expr_ arg = parsePN_impl(commands);
+            expression = unaryOp(command, arg);
+        } else if(isVariable(command)) {
+            expression = variable(command);
+        } else {
+            expression = constant(command);
+        }
+        if(!expression) {
+            ofLogError("ofxExpression") << (command + " : unknown command");
+        }
+        return expression;
     }
+
+#define Eq(Op) Op::eq(command)
     
+#define ConstructVar(Op) if(Eq(Op)) return Expr_(new Op());
+    inline bool isVariable(const string &command) const {
+        return Eq(X)
+            || Eq(Y)
+            || Eq(Z)
+        ;
+    }
     Expr_ variable(const string &command) const {
-        if(command == "x") {
-            return Expr_(new X());
-        }
-        if(command == "y") {
-            return Expr_(new Y());
-        }
-        if(command == "z") {
-            return Expr_(new Z());
-        }
-    }
-    
-    bool isUnaryOp(const string &command) const {
-        return command == "sin" || command == "cos" || command == "tan" || command == "asin" || command == "acos" || command == "atan" || command == "abs" || command == "log";
-    }
-    
-    Expr_ unaryOp(const string &op, Expr_ arg) {
-        if(!static_cast<bool>(arg)) {
-            return Expr_();
-        }
-        if(op == "sin") {
-            return Expr_(new Sin(arg));
-        }
-        if(op == "cos") {
-            return Expr_(new Cos(arg));
-        }
-        if(op == "tan") {
-            return Expr_(new Tan(arg));
-        }
-        if(op == "asin") {
-            return Expr_(new Asin(arg));
-        }
-        if(op == "acos") {
-            return Expr_(new Acos(arg));
-        }
-        if(op == "atan") {
-            return Expr_(new Atan(arg));
-        }
-        if(op == "abs") {
-            return Expr_(new Abs(arg));
-        }
-        if(op == "log") {
-            return Expr_(new Log(arg));
-        }
-        
+        ConstructVar(X);
+        ConstructVar(Y);
+        ConstructVar(Z);
         return Expr_();
     }
+#undef ConstructVar
     
-    bool isBinaryOp(const string &command) const {
-        return command == "+" || command == "add"
-            || command == "-" || command == "sub"
-            || command == "*" || command == "mul"
-            || command == "/" || command == "div"
-            || command == "pow";
+#define ConstructUnary(Op) if(Eq(Op)) return Expr_(new Op(arg));
+    inline bool isUnaryOp(const string &command) const {
+        return Eq(Sin)
+            || Eq(Cos)
+            || Eq(Tan)
+            || Eq(Asin)
+            || Eq(Acos)
+            || Eq(Atan)
+            || Eq(Abs)
+            || Eq(Log)
+            || Eq(Sqrt)
+        ;
     }
-    
-    Expr_ binaryOp(const string &op, Expr_ arg1, Expr_ arg2) {
-        if(!(static_cast<bool>(arg1) && static_cast<bool>(arg2))) {
-            return Expr_();
-        }
-        if(op == "+" || op == "add") {
-            return Expr_(new Add(arg1, arg2));
-        }
-        if(op == "-" || op == "sub") {
-            return Expr_(new Sub(arg1, arg2));
-        }
-        if(op == "*" || op == "mul") {
-            return Expr_(new Mul(arg1, arg2));
-        }
-        if(op == "/" || op == "div") {
-            return Expr_(new Div(arg1, arg2));
-        }
-        if(op == "pow") {
-            return Expr_(new Pow(arg1, arg2));
+    Expr_ unaryOp(const string &command, Expr_ arg) {
+        if(arg) {
+            ConstructUnary(Sin);
+            ConstructUnary(Cos);
+            ConstructUnary(Tan);
+            ConstructUnary(Asin);
+            ConstructUnary(Acos);
+            ConstructUnary(Atan);
+            ConstructUnary(Abs);
+            ConstructUnary(Log);
+            ConstructUnary(Sqrt);
         }
         return Expr_();
     }
+#undef ConstructUnary
+    
+#define ConstructBinary(Op) if(Eq(Op)) return Expr_(new Op(arg1, arg2));
+    inline bool isBinaryOp(const string &command) const {
+        return Eq(Add)
+            || Eq(Sub)
+            || Eq(Mul)
+            || Eq(Div)
+            || Eq(Pow)
+        ;
+    }
+    Expr_ binaryOp(const string &command, Expr_ arg1, Expr_ arg2) {
+        if(arg1 && arg2) {
+            ConstructBinary(Add);
+            ConstructBinary(Sub);
+            ConstructBinary(Mul);
+            ConstructBinary(Div);
+            ConstructBinary(Pow);
+        }
+        return Expr_();
+    }
+#undef ConstructBinary
+#undef Eq
     
     Expr_ constant(const string &command) {
         string dotTrashed = command;
@@ -164,30 +170,6 @@ public:
         }
         
         return Expr_(new Constant(ofToFloat(command)));
-    }
-    
-    Expr_ parsePN(queue<string> &commands) {
-        if(commands.size() == 0) {
-            return expression = parseError("command is finished before complete parsing");
-        }
-        const string &command = commands.front();
-        commands.pop();
-        if(isBinaryOp(command)) {
-            Expr_ arg1 = parsePN(commands);
-            Expr_ arg2 = parsePN(commands);
-            expression = binaryOp(command, arg1, arg2);
-        } else if(isUnaryOp(command)) {
-            Expr_ arg = parsePN(commands);
-            expression = unaryOp(command, arg);
-        } else if(isVariable(command)) {
-            expression = variable(command);
-        } else {
-            expression = constant(command);
-        }
-        if(!expression) {
-            ofLogError("ofxExpression") << (command + " : unknown command");
-        }
-        return expression;
     }
 };
 

@@ -30,6 +30,7 @@ protected:
 };
 
 #define body(expr) virtual float eval(float x, float y, float z) const { return expr; }
+#define op_check(op_expr) static bool eq(const string &command) { return op_expr; }
 
 struct Constant : Expr {
     float val;
@@ -37,12 +38,14 @@ struct Constant : Expr {
     body(val);
 };
 
+#define var(name, expr, op_expr) struct name : Expr  {\
+    body(expr);\
+    op_check(op_expr);\
+};
 
-#define var(name, expr) struct name : Expr  { body(expr); };
-
-var(X, x);
-var(Y, y);
-var(Z, z);
+var(X, x, (command == "x"));
+var(Y, y, (command == "y"));
+var(Z, z, (command == "z"));
 
 #undef var
 
@@ -51,34 +54,37 @@ var(Z, z);
 #define _2 ev(arg2)
 #define _3 ev(arg3)
 
-#define bin_op(name, expr)\
+#define bin_op(name, expr, op_expr)\
 struct name : Expr {\
     name(Expr_ arg1, Expr_ arg2) : Expr(arg1, arg2) {};\
     body(expr);\
+    op_check(op_expr);\
 };
 
-bin_op(Add, _1 + _2);
-bin_op(Sub, _1 - _2);
-bin_op(Mul, _1 * _2);
-bin_op(Div, _1 / _2);
-bin_op(Pow, powf(_1, _2));
+bin_op(Add, _1 + _2, (command == "+" || command == "add"));
+bin_op(Sub, _1 - _2, (command == "-" || command == "sub"));
+bin_op(Mul, _1 * _2, (command == "*" || command == "mul"));
+bin_op(Div, _1 / _2, (command == "/" || command == "div"));
+bin_op(Pow, powf(_1, _2), command == "pow");
 
 #undef bin_op
 
-#define un_op(name, expr)\
+#define un_op(name, expr, op_expr)\
 struct name : Expr  {\
     name(Expr_ arg1) : Expr(arg1) {};\
     body(expr);\
+    op_check(op_expr);\
 };
 
-un_op(Sin, sinf(_1));
-un_op(Cos, cosf(_1));
-un_op(Tan, tanf(_1));
-un_op(Asin, asinf(_1));
-un_op(Acos, acosf(_1));
-un_op(Atan, atanf(_1));
-un_op(Abs, fabsf(_1));
-un_op(Log, logf(_1));
+un_op(Sin, sinf(_1), (command == "sin"));
+un_op(Cos, cosf(_1), (command == "cos"));
+un_op(Tan, tanf(_1), (command == "tan"));
+un_op(Asin, asinf(_1), (command == "asin"));
+un_op(Acos, acosf(_1), (command == "acos"));
+un_op(Atan, atanf(_1), (command == "atan"));
+un_op(Abs, fabsf(_1), (command == "abs"));
+un_op(Log, logf(_1), (command == "log"));
+un_op(Sqrt, sqrtf(_1), (command == "sqrt"));
 
 #undef un_op
 
