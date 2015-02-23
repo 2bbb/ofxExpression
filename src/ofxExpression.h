@@ -15,6 +15,41 @@
 BEGIN_NAMESPACE(ofx)
 BEGIN_NAMESPACE(Expression)
 
+#define sadness_cpp11 0
+
+#pragma mark for bright future
+#if sadness_cpp11
+
+template <typename ...>
+struct BinaryOpHelper;
+
+template <typename T, typename ... Ts>
+struct BinaryOpHelper<T, Ts ...> {
+    static bool IsBinaryOp(const string &command) {
+        return T::eq(command) || BinaryOpHelper<Ts ...>::IsBinaryOp(command);
+    }
+    
+    static Expr_ ConstructBinaryOp(const string &command, Expr_ arg1, Expr_ arg2) {
+        if(T::eq(command)) return Expr_(new T(arg1, arg2));
+        else return BinaryOpHelper<Ts ...>::ConstructBinaryOp(command, arg1, arg2);
+    }
+};
+
+template <>
+struct BinaryOpHelper<> {
+    static bool IsBinaryOp(const string &command) {
+        return false;
+    }
+    
+    static Expr_ ConstructBinaryOp(const string &command, Expr_ arg1, Expr_ arg2) {
+        return Expr_();
+    }
+};
+
+using BOH = BinaryOpHelper<Add, Sub, Mul, Div, Pow>;
+
+#endif
+
 class ofxExpression {
     Expr_ expression;
 public:
