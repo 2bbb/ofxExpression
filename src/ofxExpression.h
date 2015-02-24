@@ -116,7 +116,7 @@ public:
             expression = constant(command);
         }
         if(!expression) {
-            ofLogError("ofxExpression") << (command + " : unknown command");
+            return parseError(command + " : unknown command");
         }
         return expression;
     }
