@@ -149,6 +149,9 @@ public:
             || Eq(Abs)
             || Eq(Log)
             || Eq(Sqrt)
+            || Eq(Floor)
+            || Eq(Round)
+            || Eq(Ceil)
         ;
     }
     Expr_ unaryOp(const string &command, Expr_ arg) {
@@ -162,6 +165,9 @@ public:
             ConstructUnary(Abs);
             ConstructUnary(Log);
             ConstructUnary(Sqrt);
+            ConstructUnary(Floor);
+            ConstructUnary(Ceil);
+            ConstructUnary(Round);
         }
         return Expr_();
     }

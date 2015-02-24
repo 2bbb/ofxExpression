@@ -85,6 +85,9 @@ un_op(Atan, atanf(_1), (command == "atan"));
 un_op(Abs, fabsf(_1), (command == "abs"));
 un_op(Log, logf(_1), (command == "log"));
 un_op(Sqrt, sqrtf(_1), (command == "sqrt"));
+un_op(Floor, floorf(_1), (command == "floor"));
+un_op(Ceil, ceilf(_1), (command == "ceil"));
+un_op(Round, roundf(_1), (command == "round"));
 
 #undef un_op
 

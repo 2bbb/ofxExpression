@@ -23,7 +23,7 @@ Evaluate expression
 <digits>    ::= <digit> | <digit> <digits>
 <digit>     ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <var>       ::= "x" | "y" | "z"
-<unary_op>  ::= "sin" | "cos" | "tan" | "asin" | "acos" | "atan" | "abs" | "log" | "sqrt"
+<unary_op>  ::= "sin" | "cos" | "tan" | "asin" | "acos" | "atan" | "abs" | "log" | "sqrt" | "floor" | "round" | "ceil"
 <binary_op> ::= "add" | "+" | "sub" | "-" | "mul" | "*" | "div" | "/" | "pow"
 ```
 
