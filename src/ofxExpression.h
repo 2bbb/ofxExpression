@@ -88,7 +88,6 @@ public:
     }
     
     Expr parsePN(string expr) {
-        ofLogNotice() << expr;
         vector<string> splitted = ofSplitString(expr, " ");
         ofRemove(splitted, &ofxExpression::isEmpty);
         queue<string> commands;
@@ -201,19 +200,8 @@ public:
 #undef Eq
     
     Expr constant(const string &command) {
-        ofLogNotice("constant") << command;
-        string dotTrashed = command;
-        ofStringReplace(dotTrashed, ".", "");
-        if(1 < command.length() - dotTrashed.length()) {
-            return parseError(command + " : many . appeared.");
-        }
-        const char *s = dotTrashed.c_str();
-        if(!isdigit(*s) && (*s != '-')) {
-            return parseError(command + " : is not numeric string.");
-        }
-        s++;
-        while(*s != '\0') {
-            if(!isdigit(*s++)) return parseError(command + " : is not numeric string.");
+        if(!Constant::isConstant(command)) {
+            return Expr();
         }
         
         return Expr(new Constant(ofToFloat(command)));

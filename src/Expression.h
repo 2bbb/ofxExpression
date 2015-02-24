@@ -38,6 +38,22 @@ struct Constant : Expr_ {
     float val;
     Constant(float val) : val(val) {}
     body(val);
+    static bool isConstant(string command) {
+        string dotTrashed = command;
+        ofStringReplace(dotTrashed, ".", "");
+        if(1 < command.length() - dotTrashed.length()) {
+            return false;
+        }
+        const char *s = dotTrashed.c_str();
+        if(!isdigit(*s) && (*s != '-')) {
+            return false;
+        }
+        s++;
+        while(*s != '\0') {
+            if(!isdigit(*s++)) return false;
+        }
+        return true;
+    }
 };
 
 #define var(name, expr, op_expr) struct name : Expr_  {\
