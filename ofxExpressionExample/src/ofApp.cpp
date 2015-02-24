@@ -13,8 +13,29 @@ void ofApp::setup(){
     
     receiver.setup(9005);
     
-    ofx::Expression::Parser p("sin(x + y) * cos(z) * cos(z)");
-    ofLogNotice("politish notation") << p.polishNotationizedSource();
+    ofx::Expression::Parser p("1 - 2 - 3");
+    ofLogNotice("original") << p.rawSource();
+    ofLogNotice("politish") << p.polishNotationizedSource();
+    
+    ofLogNotice() << endl;
+    
+    ofx::Expression::Parser q("sin(x + y) * cos(y) * cos(z) + pow(1, 2)");
+    ofLogNotice("original") << q.rawSource();
+    ofLogNotice("politish") << q.polishNotationizedSource();
+    
+    ofLogNotice() << endl;
+    
+    ofx::Expression::Parser r("sin(x + y) * (cos(y) * (cos(z) + pow(1, 2)))");
+    ofLogNotice("original") << r.rawSource();
+    ofLogNotice("politish") << r.polishNotationizedSource();
+    
+    ofLogNotice() << endl;
+    
+    ofx::Expression::Parser s("sin(x + y) + (cos(y) * (cos(z) + pow(1, 2)))");
+    ofLogNotice("original") << s.rawSource();
+    ofLogNotice("politish") << s.polishNotationizedSource();
+    
+    ofExit();
 }
 
 //--------------------------------------------------------------
