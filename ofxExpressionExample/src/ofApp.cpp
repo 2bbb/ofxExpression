@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include "Parser.h"
 
 const int size = 50;
 
@@ -6,11 +7,14 @@ const int size = 50;
 void ofApp::setup(){
     expr.parsePN("/ sin 1 + 2 4.4");
     
-    ofLogNotice() << expr.eval(1, 2, 3);
+//    ofLogNotice() << expr.eval(1, 2, 3);
     
     expr.parsePN("sin x");
     
     receiver.setup(9005);
+    
+    ofx::Expression::Parser p("sin(x + y) * cos(z) * cos(z)");
+    ofLogNotice("politish notation") << p.polishNotationizedSource();
 }
 
 //--------------------------------------------------------------
