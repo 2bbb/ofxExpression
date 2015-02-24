@@ -30,7 +30,9 @@ protected:
 };
 
 #define body(expr) virtual float eval(float x, float y, float z) const { return expr; }
-#define op_check(op_expr) static bool eq(const string &command) { return op_expr; }
+#define op_check(op_expr)\
+    static const string commandName() { return op_expr; }\
+    static bool eq(const string &command) { return command == string(op_expr); }
 
 struct Constant : Expr {
     float val;
@@ -43,9 +45,9 @@ struct Constant : Expr {
     op_check(op_expr);\
 };
 
-var(X, x, (command == "x"));
-var(Y, y, (command == "y"));
-var(Z, z, (command == "z"));
+var(X, x, "x");
+var(Y, y, "y");
+var(Z, z, "z");
 
 #undef var
 
@@ -61,11 +63,11 @@ struct name : Expr {\
     op_check(op_expr);\
 };
 
-bin_op(Add, _1 + _2, (command == "+" || command == "add"));
-bin_op(Sub, _1 - _2, (command == "-" || command == "sub"));
-bin_op(Mul, _1 * _2, (command == "*" || command == "mul"));
-bin_op(Div, _1 / _2, (command == "/" || command == "div"));
-bin_op(Pow, powf(_1, _2), command == "pow");
+bin_op(Add, _1 + _2, "add");
+bin_op(Sub, _1 - _2, "sub");
+bin_op(Mul, _1 * _2, "mul");
+bin_op(Div, _1 / _2, "div");
+bin_op(Pow, powf(_1, _2), "pow");
 
 #undef bin_op
 
@@ -76,18 +78,18 @@ struct name : Expr  {\
     op_check(op_expr);\
 };
 
-un_op(Sin, sinf(_1), (command == "sin"));
-un_op(Cos, cosf(_1), (command == "cos"));
-un_op(Tan, tanf(_1), (command == "tan"));
-un_op(Asin, asinf(_1), (command == "asin"));
-un_op(Acos, acosf(_1), (command == "acos"));
-un_op(Atan, atanf(_1), (command == "atan"));
-un_op(Abs, fabsf(_1), (command == "abs"));
-un_op(Log, logf(_1), (command == "log"));
-un_op(Sqrt, sqrtf(_1), (command == "sqrt"));
-un_op(Floor, floorf(_1), (command == "floor"));
-un_op(Ceil, ceilf(_1), (command == "ceil"));
-un_op(Round, roundf(_1), (command == "round"));
+un_op(Sin, sinf(_1), "sin");
+un_op(Cos, cosf(_1), "cos");
+un_op(Tan, tanf(_1), "tan");
+un_op(Asin, asinf(_1), "asin");
+un_op(Acos, acosf(_1), "acos");
+un_op(Atan, atanf(_1), "atan");
+un_op(Abs, fabsf(_1), "abs");
+un_op(Log, logf(_1), "log");
+un_op(Sqrt, sqrtf(_1), "sqrt");
+un_op(Floor, floorf(_1), "floor");
+un_op(Ceil, ceilf(_1), "ceil");
+un_op(Round, roundf(_1), "round");
 
 #undef un_op
 

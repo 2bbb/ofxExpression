@@ -88,11 +88,16 @@ public:
     }
     
     Expr_ parsePN(string expr) {
+        ofLogNotice() << expr;
         vector<string> splitted = ofSplitString(expr, " ");
         ofRemove(splitted, &ofxExpression::isEmpty);
         queue<string> commands;
         for(const string &command : splitted) {
-            commands.push(command);
+            if(command == "+")      commands.push(Add::commandName());
+            else if(command == "-") commands.push(Sub::commandName());
+            else if(command == "*") commands.push(Mul::commandName());
+            else if(command == "/") commands.push(Div::commandName());
+            else commands.push(command);
         }
         return expression = parsePN_impl(commands);
     }
@@ -101,7 +106,7 @@ public:
         if(commands.size() == 0) {
             return expression = parseError("command is finished before complete parsing");
         }
-        const string &command = commands.front();
+        string command = commands.front();
         commands.pop();
         if(isBinaryOp(command)) {
             Expr_ arg1 = parsePN_impl(commands);
@@ -196,13 +201,14 @@ public:
 #undef Eq
     
     Expr_ constant(const string &command) {
+        ofLogNotice("constant") << command;
         string dotTrashed = command;
         ofStringReplace(dotTrashed, ".", "");
         if(1 < command.length() - dotTrashed.length()) {
             return parseError(command + " : many . appeared.");
         }
         const char *s = dotTrashed.c_str();
-        if(!isdigit(*s) && *s != '-') {
+        if(!isdigit(*s) && (*s != '-')) {
             return parseError(command + " : is not numeric string.");
         }
         s++;
