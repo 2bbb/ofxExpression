@@ -29,8 +29,8 @@ struct BinaryOpHelper<T, Ts ...> {
         return T::eq(command) || BinaryOpHelper<Ts ...>::IsBinaryOp(command);
     }
     
-    static Expr_ ConstructBinaryOp(const string &command, Expr_ arg1, Expr_ arg2) {
-        if(T::eq(command)) return Expr_(new T(arg1, arg2));
+    static Expr ConstructBinaryOp(const string &command, Expr arg1, Expr arg2) {
+        if(T::eq(command)) return Expr(new T(arg1, arg2));
         else return BinaryOpHelper<Ts ...>::ConstructBinaryOp(command, arg1, arg2);
     }
 };
@@ -41,8 +41,8 @@ struct BinaryOpHelper<> {
         return false;
     }
     
-    static Expr_ ConstructBinaryOp(const string &command, Expr_ arg1, Expr_ arg2) {
-        return Expr_();
+    static Expr ConstructBinaryOp(const string &command, Expr arg1, Expr arg2) {
+        return Expr();
     }
 };
 
@@ -51,7 +51,7 @@ using BOH = BinaryOpHelper<Add, Sub, Mul, Div, Pow>;
 #endif
 
 class ofxExpression {
-    Expr_ expression;
+    Expr expression;
 public:
     ofxExpression() {}
     ofxExpression(string expr, bool isPN = true) {
@@ -78,16 +78,16 @@ public:
         return static_cast<bool>(expression);
     }
 
-    Expr_ parseError(const string &error) {
+    Expr parseError(const string &error) {
         ofLogError("ofxExpression") << error;
-        return Expr_();
+        return Expr();
     }
     
     static bool isEmpty(string str) {
         return str.length() == 0;
     }
     
-    Expr_ parsePN(string expr) {
+    Expr parsePN(string expr) {
         ofLogNotice() << expr;
         vector<string> splitted = ofSplitString(expr, " ");
         ofRemove(splitted, &ofxExpression::isEmpty);
@@ -102,18 +102,18 @@ public:
         return expression = parsePN_impl(commands);
     }
     
-    Expr_ parsePN_impl(queue<string> &commands) {
+    Expr parsePN_impl(queue<string> &commands) {
         if(commands.size() == 0) {
             return expression = parseError("command is finished before complete parsing");
         }
         string command = commands.front();
         commands.pop();
         if(isBinaryOp(command)) {
-            Expr_ arg1 = parsePN_impl(commands);
-            Expr_ arg2 = parsePN_impl(commands);
+            Expr arg1 = parsePN_impl(commands);
+            Expr arg2 = parsePN_impl(commands);
             expression = binaryOp(command, arg1, arg2);
         } else if(isUnaryOp(command)) {
-            Expr_ arg = parsePN_impl(commands);
+            Expr arg = parsePN_impl(commands);
             expression = unaryOp(command, arg);
         } else if(isVariable(command)) {
             expression = variable(command);
@@ -128,22 +128,22 @@ public:
 
 #define Eq(Op) Op::eq(command)
     
-#define ConstructVar(Op) if(Eq(Op)) return Expr_(new Op());
+#define ConstructVar(Op) if(Eq(Op)) return Expr(new Op());
     inline bool isVariable(const string &command) const {
         return Eq(X)
             || Eq(Y)
             || Eq(Z)
         ;
     }
-    Expr_ variable(const string &command) const {
+    Expr variable(const string &command) const {
         ConstructVar(X);
         ConstructVar(Y);
         ConstructVar(Z);
-        return Expr_();
+        return Expr();
     }
 #undef ConstructVar
     
-#define ConstructUnary(Op) if(Eq(Op)) return Expr_(new Op(arg));
+#define ConstructUnary(Op) if(Eq(Op)) return Expr(new Op(arg));
     inline bool isUnaryOp(const string &command) const {
         return Eq(Sin)
             || Eq(Cos)
@@ -159,7 +159,7 @@ public:
             || Eq(Ceil)
         ;
     }
-    Expr_ unaryOp(const string &command, Expr_ arg) {
+    Expr unaryOp(const string &command, Expr arg) {
         if(arg) {
             ConstructUnary(Sin);
             ConstructUnary(Cos);
@@ -174,11 +174,11 @@ public:
             ConstructUnary(Ceil);
             ConstructUnary(Round);
         }
-        return Expr_();
+        return Expr();
     }
 #undef ConstructUnary
     
-#define ConstructBinary(Op) if(Eq(Op)) return Expr_(new Op(arg1, arg2));
+#define ConstructBinary(Op) if(Eq(Op)) return Expr(new Op(arg1, arg2));
     inline bool isBinaryOp(const string &command) const {
         return Eq(Add)
             || Eq(Sub)
@@ -187,7 +187,7 @@ public:
             || Eq(Pow)
         ;
     }
-    Expr_ binaryOp(const string &command, Expr_ arg1, Expr_ arg2) {
+    Expr binaryOp(const string &command, Expr arg1, Expr arg2) {
         if(arg1 && arg2) {
             ConstructBinary(Add);
             ConstructBinary(Sub);
@@ -195,12 +195,12 @@ public:
             ConstructBinary(Div);
             ConstructBinary(Pow);
         }
-        return Expr_();
+        return Expr();
     }
 #undef ConstructBinary
 #undef Eq
     
-    Expr_ constant(const string &command) {
+    Expr constant(const string &command) {
         ofLogNotice("constant") << command;
         string dotTrashed = command;
         ofStringReplace(dotTrashed, ".", "");
@@ -216,7 +216,7 @@ public:
             if(!isdigit(*s++)) return parseError(command + " : is not numeric string.");
         }
         
-        return Expr_(new Constant(ofToFloat(command)));
+        return Expr(new Constant(ofToFloat(command)));
     }
 };
 

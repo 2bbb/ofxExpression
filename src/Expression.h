@@ -15,18 +15,18 @@
 BEGIN_NAMESPACE(ofx)
 BEGIN_NAMESPACE(Expression)
 
-struct Expr;
-typedef shared_ptr<Expr> Expr_;
+struct Expr_;
+typedef shared_ptr<Expr_> Expr;
 
-struct Expr {
-    Expr(Expr_ arg1 = Expr_(), Expr_ arg2 = Expr_(), Expr_ arg3 = Expr_())
+struct Expr_ {
+    Expr_(Expr arg1 = Expr(), Expr arg2 = Expr(), Expr arg3 = Expr())
     : arg1(arg1)
     , arg2(arg2)
     , arg3(arg3) {}
     
     virtual float eval(float x = 0.0f, float y = 0.0f, float z = 0.0f) const = 0;
 protected:
-    Expr_ arg1, arg2, arg3;
+    Expr arg1, arg2, arg3;
 };
 
 #define body(expr) virtual float eval(float x, float y, float z) const { return expr; }
@@ -34,13 +34,13 @@ protected:
     static const string commandName() { return op_expr; }\
     static bool eq(const string &command) { return command == string(op_expr); }
 
-struct Constant : Expr {
+struct Constant : Expr_ {
     float val;
     Constant(float val) : val(val) {}
     body(val);
 };
 
-#define var(name, expr, op_expr) struct name : Expr  {\
+#define var(name, expr, op_expr) struct name : Expr_  {\
     body(expr);\
     op_check(op_expr);\
 };
@@ -57,8 +57,8 @@ var(Z, z, "z");
 #define _3 ev(arg3)
 
 #define bin_op(name, expr, op_expr)\
-struct name : Expr {\
-    name(Expr_ arg1, Expr_ arg2) : Expr(arg1, arg2) {};\
+struct name : Expr_ {\
+    name(Expr arg1, Expr arg2) : Expr_(arg1, arg2) {};\
     body(expr);\
     op_check(op_expr);\
 };
@@ -72,8 +72,8 @@ bin_op(Pow, powf(_1, _2), "pow");
 #undef bin_op
 
 #define un_op(name, expr, op_expr)\
-struct name : Expr  {\
-    name(Expr_ arg1) : Expr(arg1) {};\
+struct name : Expr_  {\
+    name(Expr arg1) : Expr_(arg1) {};\
     body(expr);\
     op_check(op_expr);\
 };
