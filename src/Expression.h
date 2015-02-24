@@ -31,8 +31,8 @@ protected:
 
 #define body(expr) virtual float eval(float x, float y, float z) const { return expr; }
 #define op_check(op_expr)\
-    static const string commandName() { return op_expr; }\
-    static bool eq(const string &command) { return command == string(op_expr); }
+    inline static const string commandName() { return op_expr; }\
+    inline static bool eq(const string &command) { return command == string(op_expr); }
 
 struct Constant : Expr_ {
     float val;
