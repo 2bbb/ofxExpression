@@ -8,47 +8,13 @@
 #pragma once
 
 #include "Expression.h"
+#include "Parser.h"
 
 #define BEGIN_NAMESPACE(name) namespace name {
 #define END_NAMESPACE(name) };
 
 BEGIN_NAMESPACE(ofx)
 BEGIN_NAMESPACE(Expression)
-
-#define sadness_cpp11 0
-
-#pragma mark for bright future
-#if sadness_cpp11
-
-template <typename ...>
-struct BinaryOpHelper;
-
-template <typename T, typename ... Ts>
-struct BinaryOpHelper<T, Ts ...> {
-    static bool IsBinaryOp(const string &command) {
-        return T::eq(command) || BinaryOpHelper<Ts ...>::IsBinaryOp(command);
-    }
-    
-    static Expr ConstructBinaryOp(const string &command, Expr arg1, Expr arg2) {
-        if(T::eq(command)) return Expr(new T(arg1, arg2));
-        else return BinaryOpHelper<Ts ...>::ConstructBinaryOp(command, arg1, arg2);
-    }
-};
-
-template <>
-struct BinaryOpHelper<> {
-    static bool IsBinaryOp(const string &command) {
-        return false;
-    }
-    
-    static Expr ConstructBinaryOp(const string &command, Expr arg1, Expr arg2) {
-        return Expr();
-    }
-};
-
-using BOH = BinaryOpHelper<Add, Sub, Mul, Div, Pow>;
-
-#endif
 
 class ofxExpression {
     Expr expression;
@@ -87,7 +53,16 @@ public:
         return str.length() == 0;
     }
     
-    Expr parsePN(string expr) {
+    bool parse(string expr) {
+        Parser parser(expr);
+        if(parser.isValidExpression()) {
+            return parsePN(parser.polishNotationizedSource());
+        } else {
+            return false;
+        }
+    }
+    
+    bool parsePN(string expr) {
         vector<string> splitted = ofSplitString(expr, " ");
         ofRemove(splitted, &ofxExpression::isEmpty);
         queue<string> commands;
@@ -98,7 +73,8 @@ public:
             else if(command == "/") commands.push(Div::commandName());
             else commands.push(command);
         }
-        return expression = parsePN_impl(commands);
+        expression = parsePN_impl(commands);
+        return expression;
     }
     
     Expr parsePN_impl(queue<string> &commands) {
