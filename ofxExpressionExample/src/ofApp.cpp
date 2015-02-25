@@ -14,7 +14,7 @@ void ofApp::setup(){
     receiver.setup(9005);
     
     expr[0].parse("sin(x + y) * cos(y) * cos(z) * (abs(x) + 1)");
-    expr[1].parse("cos(x + y) * cos(y) * cos(z) * (abs(x) + 1)");
+    expr[1].parse("cos(x + y) * cos(y) * cos(z) * (1 / abs(x) + 1)");
     current.set(ofRandomWidth() - ofGetWidth() * 0.5f,
                 ofRandomHeight() - ofGetHeight() * 0.5f,
                 ofRandomHeight() - ofGetHeight() * 0.5f);

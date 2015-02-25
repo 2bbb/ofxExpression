@@ -31,7 +31,6 @@ public:
     float eval(float x = 0.0f, float y = 0.0f, float z = 0.0f) const {
         if(expression) return expression->eval(x, y, z);
         else {
-            ofLogError("ofxExpression") << "evaluate invalid expression!!";
             return 0.0f;
         }
     }
@@ -58,6 +57,7 @@ public:
         if(parser.isValidExpression()) {
             return parsePN(parser.polishNotationizedSource());
         } else {
+            ofLogError("ofxExpression") << "evaluate invalid expression!!" << expr;
             return false;
         }
     }
@@ -74,6 +74,9 @@ public:
             else commands.push(command);
         }
         expression = parsePN_impl(commands);
+        if(!expression) {
+            ofLogError("ofxExpression") << "evaluate invalid expression!!" << expr;
+        }
         return expression;
     }
     
