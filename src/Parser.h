@@ -166,7 +166,7 @@ private:
     
     string searchOps(string fragment) const {
         static const char * ops[] = {",", "+", "-", "*", "/"};
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < 5; i++) {
             if(fragment.find_last_of(ops[i]) != string::npos) {
                 return ops[i];
             }
