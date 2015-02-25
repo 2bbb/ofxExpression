@@ -53,6 +53,10 @@ public:
         return master;
     }
     
+    bool isValidExpression() const {
+        return master;
+    }
+    
     string polishNotationizedSource() const {
         if(master) {
             return master->print();

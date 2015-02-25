@@ -71,6 +71,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		95AEB3001A9D661500DC5533 /* Future.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Future.h; sourceTree = "<group>"; };
 		95F3AE441A99625F00F028CD /* ofxExpression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ofxExpression.h; path = ../src/ofxExpression.h; sourceTree = "<group>"; };
 		95F3AE461A9964CA00F028CD /* Expression.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Expression.h; path = ../src/Expression.h; sourceTree = "<group>"; };
 		95F3AE561A9B1A3500F028CD /* ofxOsc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxOsc.h; sourceTree = "<group>"; };
@@ -358,6 +359,7 @@
 				95F3AE461A9964CA00F028CD /* Expression.h */,
 				95F3AE8B1A9C13AF00F028CD /* Parser.h */,
 				95F3AE9A1A9C731500F028CD /* StringUtilities.h */,
+				95AEB3001A9D661500DC5533 /* Future.h */,
 			);
 			name = src;
 			sourceTree = "<group>";
