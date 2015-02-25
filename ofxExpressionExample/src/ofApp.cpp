@@ -5,37 +5,25 @@ const int size = 50;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    expr.parsePN("/ sin 1 + 2 4.4");
+    index = 0;
+    trans = index;
+    expr[index].parsePN("/ sin 1 + 2 4.4");
     
-//    ofLogNotice() << expr.eval(1, 2, 3);
-    
-    expr.parsePN("sin x");
+    expr[index].parsePN("sin x");
     
     receiver.setup(9005);
     
-    ofx::Expression::Parser p("1 - 2 - 3");
-    ofLogNotice("original") << p.rawSource();
-    ofLogNotice("politish") << p.polishNotationizedSource();
+    expr[0].parse("sin(x + y) * cos(y) * cos(z) * (abs(x) + 1)");
+    expr[1].parse("cos(x + y) * cos(y) * cos(z) * (abs(x) + 1)");
+    current.set(ofRandomWidth() - ofGetWidth() * 0.5f,
+                ofRandomHeight() - ofGetHeight() * 0.5f,
+                ofRandomHeight() - ofGetHeight() * 0.5f);
+    next.set(ofRandomWidth() - ofGetWidth() * 0.5f,
+             ofRandomHeight() - ofGetHeight() * 0.5f,
+             ofRandomHeight() - ofGetHeight() * 0.5f);
     
-    ofLogNotice() << endl;
-    
-    ofx::Expression::Parser q("sin(x + y) * cos(y) * cos(z) + pow(1, 2)");
-    ofLogNotice("original") << q.rawSource();
-    ofLogNotice("politish") << q.polishNotationizedSource();
-    
-    ofLogNotice() << endl;
-    
-    ofx::Expression::Parser r("sin(x + y) * (cos(y) * (cos(z) + pow(1, 2)))");
-    ofLogNotice("original") << r.rawSource();
-    ofLogNotice("politish") << r.polishNotationizedSource();
-    
-    ofLogNotice() << endl;
-    
-    ofx::Expression::Parser s("sin(x + y) + (cos(y) * (cos(z) + pow(1, 2)))");
-    ofLogNotice("original") << s.rawSource();
-    ofLogNotice("politish") << s.polishNotationizedSource();
-    
-    ofExit();
+//    cam.setFov(3.0f);
+//    cam.setupPerspective();
 }
 
 //--------------------------------------------------------------
@@ -44,6 +32,7 @@ void ofApp::update(){
         ofxOscMessage m;
         receiver.getNextMessage(&m);
         if(m.getAddress() == "/expr") {
+            index = 1 - index;
             string command = "";
             for(int i = 0; i < m.getNumArgs(); i++) {
                 switch (m.getArgType(i)) {
@@ -63,9 +52,18 @@ void ofApp::update(){
                         break;
                 }
             }
-            expr.parsePN(command);
+            expr[index].parsePN(command);
         }
     }
+    if(ofGetFrameNum() % (60 * 2) == 0) {
+        next.set(ofRandomWidth() - ofGetWidth() * 0.5f,
+                 ofRandomHeight() - ofGetHeight() * 0.5f,
+                 ofRandomHeight() - ofGetHeight() * 0.5f);
+    }
+    current = current * 0.8f + next * 0.1f;
+    trans = trans * 0.9f + index * 0.1f;
+    cam.setPosition(10 * current);
+    cam.setTarget(ofVec3f(0, 0, 0));
 }
 
 //--------------------------------------------------------------
@@ -76,7 +74,8 @@ void ofApp::draw(){
     ofSetColor(ofColor::white, 127);
     for(int j = 0; j < size; j++) {
         for(int i = 0; i < size; i++) {
-            float v = expr.eval(ofMap(i, 0, size, 0, M_PI * 2), ofMap(j, 0, size, 0, M_PI * 2));
+            float v = expr[0].eval(ofMap(i, 0, size, 0, M_PI * 2), ofMap(j, 0, size, 0, M_PI * 2)) * (1.0f - trans)
+                    + expr[1].eval(ofMap(i, 0, size, 0, M_PI * 2), ofMap(j, 0, size, 0, M_PI * 2)) * trans;
             float x = ofMap(i - size / 2, 0, size / 2, 0, ofGetWidth());
             float y = ofMap(j - size / 2, 0, size / 2, 0, ofGetHeight());
             float z = ofMap(-v, -1, 1, -ofGetHeight() * 0.5f, ofGetHeight() * 0.5f);
@@ -89,13 +88,21 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if(key == 's') {
-        expr.parsePN("sin x");
+        index = 1 - index;
+        expr[index].parsePN("sin x");
     } else if(key == 'c') {
-        expr.parsePN("cos x");
+        index = 1 - index;
+        expr[index].parsePN("cos x");
     } else if(key == 'd') {
-        expr.parsePN("+ sin x cos y");
+        index = 1 - index;
+        expr[index].parsePN("+ sin x cos y");
     } else if(key == '_') {
-        expr.parsePN("sin * x y");
+        index = 1 - index;
+        expr[index].parsePN("sin * x y");
+    } else if(key == OF_KEY_LEFT ) {
+        index = 1 - index;
+    } else if(key == OF_KEY_RIGHT) {
+        index = 1 - index;
     }
 }
 

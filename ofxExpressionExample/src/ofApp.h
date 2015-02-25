@@ -21,7 +21,11 @@ public:
     void gotMessage(ofMessage msg);
     
 private:
-    ofxExpression expr;
+    ofxExpression expr[2];
+    int index;
+    float trans;
     ofEasyCam cam;
     ofxOscReceiver receiver;
+    ofVec3f next;
+    ofVec3f current;
 };
