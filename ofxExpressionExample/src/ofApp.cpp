@@ -1,8 +1,6 @@
 #include "ofApp.h"
 #include "Parser.h"
 
-const int size = 50;
-
 //--------------------------------------------------------------
 void ofApp::setup(){
     index = 0;

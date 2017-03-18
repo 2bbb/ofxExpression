@@ -77,7 +77,7 @@ public:
         if(!expression) {
             ofLogError("ofxExpression") << "evaluate invalid expression!!" << expr;
         }
-        return expression;
+        return expression != nullptr;
     }
     
     Expr parsePN_impl(queue<string> &commands) {

@@ -50,11 +50,11 @@ public:
     
     bool parse() {
         master = parseImpl(createNode(treatment()));
-        return master;
+        return master != nullptr;
     }
     
     bool isValidExpression() const {
-        return master;
+        return master != nullptr;
     }
     
     string polishNotationizedSource() const {

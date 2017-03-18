@@ -28,4 +28,6 @@ private:
     ofxOscReceiver receiver;
     ofVec3f next;
     ofVec3f current;
+
+    const int size = 50;
 };
