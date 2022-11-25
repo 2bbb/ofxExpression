@@ -172,8 +172,8 @@ private:
     }
     
     std::string searchOps(std::string fragment) const {
-        static const char * ops[] = {",", "+", "-", "*", "/"};
-        for(int i = 0; i < 5; i++) {
+        static const char * ops[] = {",", "+", "-", "*", "/", "%", "^"};
+        for(int i = 0; i < 7; i++) {
             if(fragment.find_last_of(ops[i]) != std::string::npos) {
                 return ops[i];
             }

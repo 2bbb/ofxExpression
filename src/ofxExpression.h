@@ -96,6 +96,8 @@ public:
             else if(command == "-") commands.push(Sub::commandName());
             else if(command == "*") commands.push(Mul::commandName());
             else if(command == "/") commands.push(Div::commandName());
+            else if(command == "%") commands.push(Fmod::commandName());
+            else if(command == "^") commands.push(Pow::commandName());
             else commands.push(command);
         }
         expression = parsePN_impl(commands);
