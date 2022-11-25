@@ -11,6 +11,7 @@
 #include "Parser.h"
 
 #include "ofUtils.h"
+#include "ofLog.h"
 
 #include <string>
 #include <queue>
@@ -23,9 +24,12 @@ BEGIN_NAMESPACE(Expression)
 
 class ofxExpression {
     Expr expression;
+    std::string expression_string;
 public:
     ofxExpression() {}
-    ofxExpression(const std::string &expr, bool isPN = true) {
+    ofxExpression(const std::string &expr, bool isPN = true)
+    : expression_string{expr}
+    {
         if(isPN) {
             parsePN(expr);
         } else {
@@ -44,8 +48,10 @@ public:
                float x9 = 0.0f,
                float x10 = 0.0f) const
     {
-        if(expression) return expression->eval(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10);
-        else {
+        if(expression) {
+            return expression->eval(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10);
+        } else {
+            ofLogError("ofxExpression") << "maybe expression is invalid: \"" << expression_string << "\"";
             return 0.0f;
         }
     }
@@ -78,7 +84,8 @@ public:
     }
     
     bool parse(const std::string &expr) {
-        Parser parser(expr);
+        expression_string = expr;
+        Parser parser{expr};
         if(parser.isValidExpression()) {
             return parsePN(parser.polishNotationizedSource());
         } else {

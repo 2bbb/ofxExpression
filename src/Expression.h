@@ -7,6 +7,10 @@
 
 #pragma once
 
+#ifndef OFX_EXPRESSION_CUSTOM_VAR_NAME
+#   define OFX_EXPRESSION_CUSTOM_VAR_NAME "x"
+#endif
+
 #include "ofUtils.h"
 
 #include <memory>
@@ -19,19 +23,18 @@
 BEGIN_NAMESPACE(ofx)
 BEGIN_NAMESPACE(Expression)
 
-struct Expr_;
-typedef std::shared_ptr<Expr_> Expr;
+using Expr = std::shared_ptr<struct Expr_>;
 
 struct Expr_ {
-    Expr_(Expr arg1 = Expr(),
-          Expr arg2 = Expr(),
-          Expr arg3 = Expr(),
-          Expr arg4 = Expr(),
-          Expr arg5 = Expr(),
-          Expr arg6 = Expr(),
-          Expr arg7 = Expr(),
-          Expr arg8 = Expr(),
-          Expr arg9 = Expr(),
+    Expr_(Expr arg1  = Expr(),
+          Expr arg2  = Expr(),
+          Expr arg3  = Expr(),
+          Expr arg4  = Expr(),
+          Expr arg5  = Expr(),
+          Expr arg6  = Expr(),
+          Expr arg7  = Expr(),
+          Expr arg8  = Expr(),
+          Expr arg9  = Expr(),
           Expr arg10 = Expr())
     : arg1{arg1}
     , arg2{arg2}
@@ -42,31 +45,34 @@ struct Expr_ {
     , arg7{arg7}
     , arg8{arg8}
     , arg9{arg9}
-    , arg10{arg10} {}
+    , arg10{arg10}
+    {}
     
-    virtual float eval(float x1 = 0.0f,
-                       float x2 = 0.0f,
-                       float x3 = 0.0f,
-                       float x4 = 0.0f,
-                       float x5 = 0.0f,
-                       float x6 = 0.0f,
-                       float x7 = 0.0f,
-                       float x8 = 0.0f,
-                       float x9 = 0.0f,
+    virtual float eval(float x1  = 0.0f,
+                       float x2  = 0.0f,
+                       float x3  = 0.0f,
+                       float x4  = 0.0f,
+                       float x5  = 0.0f,
+                       float x6  = 0.0f,
+                       float x7  = 0.0f,
+                       float x8  = 0.0f,
+                       float x9  = 0.0f,
                        float x10 = 0.0f) const = 0;
 protected:
     Expr arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10;
 };
 
-#define body(expr) virtual float eval(float x1 = 0.0f, float x2 = 0.0f, float x3 = 0.0f, float x4 = 0.0f, float x5 = 0.0f, float x6 = 0.0f, float x7 = 0.0f, float x8 = 0.0f, float x9 = 0.0f, float x10 = 0.0f) const { return expr; }
-#define op_check(op_expr)\
-    inline static const std::string commandName() { return op_expr; }\
+#define define_body(expr) virtual float eval(float x1 = 0.0f, float x2 = 0.0f, float x3 = 0.0f, float x4 = 0.0f, float x5 = 0.0f, float x6 = 0.0f, float x7 = 0.0f, float x8 = 0.0f, float x9 = 0.0f, float x10 = 0.0f) const { return expr; }
+#define define_op_check(op_expr)\
+    inline static std::string commandName() { return op_expr; }\
     inline static bool eq(const std::string &command) { return command == std::string(op_expr); }
 
 struct Constant : Expr_ {
     float val;
-    Constant(float val) : val(val) {}
-    body(val);
+    Constant(float val)
+    : val{val}
+    {}
+    define_body(val);
     static bool isConstant(std::string command) {
         std::string dotTrashed = command;
         ofStringReplace(dotTrashed, ".", "");
@@ -85,75 +91,75 @@ struct Constant : Expr_ {
     }
 };
 
-#define var(name, expr, op_expr) struct name : Expr_  {\
-    body(expr);\
-    op_check(op_expr);\
+#define define_variable(name, expr, op_expr) struct name : Expr_  {\
+    define_body(expr);\
+    define_op_check(op_expr);\
 };
 
-var( X,  x1,  "x");
-var( Y,  x2,  "y");
-var( Z,  x3,  "z");
-var( W,  x4,  "w");
-var( X1, x1,  "x1");
-var( X2, x2,  "x2");
-var( X3, x3,  "x3");
-var( X4, x4,  "x4");
-var( X5, x5,  "x5");
-var( X6, x6,  "x6");
-var( X7, x7,  "x7");
-var( X8, x8,  "x8");
-var( X9, x9,  "x9");
-var(X10, x10, "x10");
+define_variable( X,  x1,  "x");
+define_variable( Y,  x2,  "y");
+define_variable( Z,  x3,  "z");
+define_variable( W,  x4,  "w");
+define_variable(X1,  x1,  OFX_EXPRESSION_CUSTOM_VAR_NAME "1");
+define_variable(X2,  x2,  OFX_EXPRESSION_CUSTOM_VAR_NAME "2");
+define_variable(X3,  x3,  OFX_EXPRESSION_CUSTOM_VAR_NAME "3");
+define_variable(X4,  x4,  OFX_EXPRESSION_CUSTOM_VAR_NAME "4");
+define_variable(X5,  x5,  OFX_EXPRESSION_CUSTOM_VAR_NAME "5");
+define_variable(X6,  x6,  OFX_EXPRESSION_CUSTOM_VAR_NAME "6");
+define_variable(X7,  x7,  OFX_EXPRESSION_CUSTOM_VAR_NAME "7");
+define_variable(X8,  x8,  OFX_EXPRESSION_CUSTOM_VAR_NAME "8");
+define_variable(X9,  x9,  OFX_EXPRESSION_CUSTOM_VAR_NAME "9");
+define_variable(X10, x10, OFX_EXPRESSION_CUSTOM_VAR_NAME "10");
 
-#undef var
+#undef define_variable
 
 #define ev(arg) arg->eval(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10)
-#define _1 ev(arg1)
-#define _2 ev(arg2)
-#define _3 ev(arg3)
-#define _4 ev(arg4)
-#define _5 ev(arg5)
-#define _6 ev(arg6)
-#define _7 ev(arg7)
-#define _8 ev(arg8)
-#define _9 ev(arg9)
+#define _1  ev(arg1)
+#define _2  ev(arg2)
+#define _3  ev(arg3)
+#define _4  ev(arg4)
+#define _5  ev(arg5)
+#define _6  ev(arg6)
+#define _7  ev(arg7)
+#define _8  ev(arg8)
+#define _9  ev(arg9)
 #define _10 ev(arg10)
 
-#define bin_op(name, expr, op_expr)\
+#define define_bin_op(name, expr, op_expr)\
 struct name : Expr_ {\
     name(Expr arg1, Expr arg2) : Expr_(arg1, arg2) {};\
-    body(expr);\
-    op_check(op_expr);\
+    define_body(expr);\
+    define_op_check(op_expr);\
 };
 
-bin_op(Add, _1 + _2, "add");
-bin_op(Sub, _1 - _2, "sub");
-bin_op(Mul, _1 * _2, "mul");
-bin_op(Div, _1 / _2, "div");
-bin_op(Fmod, fmod(_1, _2), "fmod");
-bin_op(Pow, powf(_1, _2), "pow");
+define_bin_op(Add, _1 + _2, "add");
+define_bin_op(Sub, _1 - _2, "sub");
+define_bin_op(Mul, _1 * _2, "mul");
+define_bin_op(Div, _1 / _2, "div");
+define_bin_op(Fmod, fmod(_1, _2), "fmod");
+define_bin_op(Pow, powf(_1, _2), "pow");
 
-#undef bin_op
+#undef define_bin_op
 
-#define un_op(name, expr, op_expr)\
+#define define_un_op(name, expr, op_expr)\
 struct name : Expr_  {\
     name(Expr arg1) : Expr_(arg1) {};\
-    body(expr);\
-    op_check(op_expr);\
+    define_body(expr);\
+    define_op_check(op_expr);\
 };
 
-un_op(Sin, sinf(_1), "sin");
-un_op(Cos, cosf(_1), "cos");
-un_op(Tan, tanf(_1), "tan");
-un_op(Asin, asinf(_1), "asin");
-un_op(Acos, acosf(_1), "acos");
-un_op(Atan, atanf(_1), "atan");
-un_op(Abs, fabsf(_1), "abs");
-un_op(Log, logf(_1), "log");
-un_op(Sqrt, sqrtf(_1), "sqrt");
-un_op(Floor, floorf(_1), "floor");
-un_op(Ceil, ceilf(_1), "ceil");
-un_op(Round, roundf(_1), "round");
+define_un_op(Sin, sinf(_1), "sin");
+define_un_op(Cos, cosf(_1), "cos");
+define_un_op(Tan, tanf(_1), "tan");
+define_un_op(Asin, asinf(_1), "asin");
+define_un_op(Acos, acosf(_1), "acos");
+define_un_op(Atan, atanf(_1), "atan");
+define_un_op(Abs, fabsf(_1), "abs");
+define_un_op(Log, logf(_1), "log");
+define_un_op(Sqrt, sqrtf(_1), "sqrt");
+define_un_op(Floor, floorf(_1), "floor");
+define_un_op(Ceil, ceilf(_1), "ceil");
+define_un_op(Round, roundf(_1), "round");
 
 #undef un_op
 

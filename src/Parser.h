@@ -28,13 +28,14 @@ class Parser {
     typedef std::shared_ptr<Node_> Node;
     struct Node_ {
         Node_(const std::string &val, const std::string &name)
-        : val(val)
-        , name(name) {}
+        : val{val}
+        , name{name}
+        {}
         std::string val;
         std::string name;
         std::vector<Node> children;
         std::string print() const {
-            std::stringstream ss;
+            std::stringstream ss{""};
             ss << val;
             for(int i = 0; i < children.size(); i++) {
                 ss << " " << children[i]->print();
@@ -48,27 +49,28 @@ class Parser {
     }
 public:
     Parser(const std::string &source)
-    : source(source)
-    , index(0)
-    , tag("ofxExpression::Parser") {
+    : source{source}
+    , index{0}
+    , tag{"ofxExpression::Parser"}
+    {
         treatment();
         parse();
     }
     
     bool parse() {
         master = parseImpl(createNode(treatment()));
-        return master != nullptr;
+        return isValidExpression();
     }
     
     bool isValidExpression() const {
-        return master != nullptr;
+        return static_cast<bool>(master);
     }
     
     std::string polishNotationizedSource() const {
         if(master) {
             return master->print();
         } else {
-            ofLogError(tag) << "illegal expression";
+            ofLogError(tag) << "illegal expression: \"" << rawSource() << "\"";
             return "";
         }
     }
@@ -92,7 +94,7 @@ private:
     
     Node parseImpl(Node node) {
         std::map<std::string, std::string> fragments;
-        int nest = 0, left;
+        int nest{0}, left;
         std::string s;
         for(int i = 0; i < node->val.length(); i++) {
             switch(node->val[i]) {
@@ -187,11 +189,11 @@ private:
     int index;
     
     std::string getID() {
-        std::stringstream ss;
+        std::stringstream ss{""};
         ss << "[#" << index << "]";
         index++;
         if(500 < index) {
-            ofLogError(tag) << "fuck";
+            ofLogError(tag) << "???";
             ofExit(-1);
         }
         return ss.str();
