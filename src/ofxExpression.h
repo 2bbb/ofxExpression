@@ -33,15 +33,35 @@ public:
         }
     }
     
-    float eval(float x = 0.0f, float y = 0.0f, float z = 0.0f) const {
-        if(expression) return expression->eval(x, y, z);
+    float eval(float x1 = 0.0f,
+               float x2 = 0.0f,
+               float x3 = 0.0f,
+               float x4 = 0.0f,
+               float x5 = 0.0f,
+               float x6 = 0.0f,
+               float x7 = 0.0f,
+               float x8 = 0.0f,
+               float x9 = 0.0f,
+               float x10 = 0.0f) const
+    {
+        if(expression) return expression->eval(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10);
         else {
             return 0.0f;
         }
     }
     
-    inline float operator()(float x = 0.0f, float y = 0.0f, float z = 0.0f) const {
-        return eval(x, y, z);
+    inline float operator()(float x1 = 0.0f,
+                            float x2 = 0.0f,
+                            float x3 = 0.0f,
+                            float x4 = 0.0f,
+                            float x5 = 0.0f,
+                            float x6 = 0.0f,
+                            float x7 = 0.0f,
+                            float x8 = 0.0f,
+                            float x9 = 0.0f,
+                            float x10 = 0.0f) const
+    {
+        return eval(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10);
     }
     
     bool isValid() const {
@@ -116,12 +136,34 @@ public:
         return Eq(X)
             || Eq(Y)
             || Eq(Z)
+            || Eq(W)
+            || Eq(X1)
+            || Eq(X2)
+            || Eq(X3)
+            || Eq(X4)
+            || Eq(X5)
+            || Eq(X6)
+            || Eq(X7)
+            || Eq(X8)
+            || Eq(X9)
+            || Eq(X10)
         ;
     }
     Expr variable(const std::string &command) const {
         ConstructVar(X);
         ConstructVar(Y);
         ConstructVar(Z);
+        ConstructVar(W);
+        ConstructVar(X1);
+        ConstructVar(X2);
+        ConstructVar(X3);
+        ConstructVar(X4);
+        ConstructVar(X5);
+        ConstructVar(X6);
+        ConstructVar(X7);
+        ConstructVar(X8);
+        ConstructVar(X9);
+        ConstructVar(X10);
         return Expr();
     }
 #undef ConstructVar
@@ -167,6 +209,7 @@ public:
             || Eq(Sub)
             || Eq(Mul)
             || Eq(Div)
+            || Eq(Fmod)
             || Eq(Pow)
         ;
     }
@@ -176,6 +219,7 @@ public:
             ConstructBinary(Sub);
             ConstructBinary(Mul);
             ConstructBinary(Div);
+            ConstructBinary(Fmod);
             ConstructBinary(Pow);
         }
         return Expr();
