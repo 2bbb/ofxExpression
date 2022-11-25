@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "ofMain.h"
+#include <string>
+#include <vector>
 
 #define BEGIN_NAMESPACE(name) namespace name {
 #define END_NAMESPACE(name) };
@@ -15,11 +16,15 @@
 BEGIN_NAMESPACE(ofx)
 BEGIN_NAMESPACE(Expression)
 
-static string replace(string source, const string &search, const string &rep, int n = 0) {
-    string::size_type pos(source.find(search));
+static std::string replace(std::string source,
+                           const std::string &search,
+                           const std::string &rep,
+                           int n = 0)
+{
+    std::string::size_type pos(source.find(search));
     int c = 0;
     
-    while(pos != string::npos) {
+    while(pos != std::string::npos) {
         source.replace(pos, search.length(), rep);
         pos = source.find(search, pos + rep.length() );
         if(n == ++c) break;
@@ -28,16 +33,19 @@ static string replace(string source, const string &search, const string &rep, in
     return source;
 }
 
-static vector<string> split(const string &str, const string &delim, int n = 0){
-    vector<string> res;
+static std::vector<std::string> split(const std::string &str,
+                                      const std::string &delim,
+                                      int n = 0)
+{
+    std::vector<std::string> res;
     size_t current = 0, found, delimlen = delim.size();
     int c = 0;
-    while((found = str.find(delim, current)) != string::npos){
-        res.push_back(string(str, current, found - current));
+    while((found = str.find(delim, current)) != std::string::npos){
+        res.push_back(std::string(str, current, found - current));
         current = found + delimlen;
         if(n == ++c) break;
     }
-    res.push_back(string(str, current, str.size() - current));
+    res.push_back(std::string(str, current, str.size() - current));
     return res;
 }
 

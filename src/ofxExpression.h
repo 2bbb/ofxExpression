@@ -10,6 +10,11 @@
 #include "Expression.h"
 #include "Parser.h"
 
+#include "ofUtils.h"
+
+#include <string>
+#include <queue>
+
 #define BEGIN_NAMESPACE(name) namespace name {
 #define END_NAMESPACE(name) };
 
@@ -20,7 +25,7 @@ class ofxExpression {
     Expr expression;
 public:
     ofxExpression() {}
-    ofxExpression(string expr, bool isPN = true) {
+    ofxExpression(const std::string &expr, bool isPN = true) {
         if(isPN) {
             parsePN(expr);
         } else {
@@ -43,16 +48,16 @@ public:
         return static_cast<bool>(expression);
     }
 
-    Expr parseError(const string &error) {
+    Expr parseError(const std::string &error) {
         ofLogError("ofxExpression") << error;
         return Expr();
     }
     
-    static bool isEmpty(string str) {
+    static bool isEmpty(const std::string &str) {
         return str.length() == 0;
     }
     
-    bool parse(string expr) {
+    bool parse(const std::string &expr) {
         Parser parser(expr);
         if(parser.isValidExpression()) {
             return parsePN(parser.polishNotationizedSource());
@@ -62,11 +67,11 @@ public:
         }
     }
     
-    bool parsePN(string expr) {
-        vector<string> splitted = ofSplitString(expr, " ");
+    bool parsePN(const std::string &expr) {
+        std::vector<std::string> splitted = ofSplitString(expr, " ");
         ofRemove(splitted, &ofxExpression::isEmpty);
-        queue<string> commands;
-        for(const string &command : splitted) {
+        std::queue<std::string> commands;
+        for(const std::string &command : splitted) {
             if(command == "+")      commands.push(Add::commandName());
             else if(command == "-") commands.push(Sub::commandName());
             else if(command == "*") commands.push(Mul::commandName());
@@ -80,11 +85,11 @@ public:
         return expression != nullptr;
     }
     
-    Expr parsePN_impl(queue<string> &commands) {
+    Expr parsePN_impl(std::queue<std::string> &commands) {
         if(commands.size() == 0) {
             return expression = parseError("command is finished before complete parsing");
         }
-        string command = commands.front();
+        std::string command = commands.front();
         commands.pop();
         if(isBinaryOp(command)) {
             Expr arg1 = parsePN_impl(commands);
@@ -107,13 +112,13 @@ public:
 #define Eq(Op) Op::eq(command)
     
 #define ConstructVar(Op) if(Eq(Op)) return Expr(new Op());
-    inline bool isVariable(const string &command) const {
+    inline bool isVariable(const std::string &command) const {
         return Eq(X)
             || Eq(Y)
             || Eq(Z)
         ;
     }
-    Expr variable(const string &command) const {
+    Expr variable(const std::string &command) const {
         ConstructVar(X);
         ConstructVar(Y);
         ConstructVar(Z);
@@ -122,7 +127,7 @@ public:
 #undef ConstructVar
     
 #define ConstructUnary(Op) if(Eq(Op)) return Expr(new Op(arg));
-    inline bool isUnaryOp(const string &command) const {
+    inline bool isUnaryOp(const std::string &command) const {
         return Eq(Sin)
             || Eq(Cos)
             || Eq(Tan)
@@ -137,7 +142,7 @@ public:
             || Eq(Ceil)
         ;
     }
-    Expr unaryOp(const string &command, Expr arg) {
+    Expr unaryOp(const std::string &command, Expr arg) {
         if(arg) {
             ConstructUnary(Sin);
             ConstructUnary(Cos);
@@ -157,7 +162,7 @@ public:
 #undef ConstructUnary
     
 #define ConstructBinary(Op) if(Eq(Op)) return Expr(new Op(arg1, arg2));
-    inline bool isBinaryOp(const string &command) const {
+    inline bool isBinaryOp(const std::string &command) const {
         return Eq(Add)
             || Eq(Sub)
             || Eq(Mul)
@@ -165,7 +170,7 @@ public:
             || Eq(Pow)
         ;
     }
-    Expr binaryOp(const string &command, Expr arg1, Expr arg2) {
+    Expr binaryOp(const std::string &command, Expr arg1, Expr arg2) {
         if(arg1 && arg2) {
             ConstructBinary(Add);
             ConstructBinary(Sub);
@@ -178,7 +183,7 @@ public:
 #undef ConstructBinary
 #undef Eq
     
-    Expr constant(const string &command) {
+    Expr constant(const std::string &command) {
         if(!Constant::isConstant(command)) {
             return Expr();
         }

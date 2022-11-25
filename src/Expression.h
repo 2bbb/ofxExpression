@@ -7,7 +7,11 @@
 
 #pragma once
 
-#include "ofMain.h"
+#include "ofUtils.h"
+
+#include <memory>
+#include <string>
+#include <ctype.h>
 
 #define BEGIN_NAMESPACE(name) namespace name {
 #define END_NAMESPACE(name) };
@@ -16,7 +20,7 @@ BEGIN_NAMESPACE(ofx)
 BEGIN_NAMESPACE(Expression)
 
 struct Expr_;
-typedef shared_ptr<Expr_> Expr;
+typedef std::shared_ptr<Expr_> Expr;
 
 struct Expr_ {
     Expr_(Expr arg1 = Expr(), Expr arg2 = Expr(), Expr arg3 = Expr())
@@ -31,15 +35,15 @@ protected:
 
 #define body(expr) virtual float eval(float x, float y, float z) const { return expr; }
 #define op_check(op_expr)\
-    inline static const string commandName() { return op_expr; }\
-    inline static bool eq(const string &command) { return command == string(op_expr); }
+    inline static const std::string commandName() { return op_expr; }\
+    inline static bool eq(const std::string &command) { return command == std::string(op_expr); }
 
 struct Constant : Expr_ {
     float val;
     Constant(float val) : val(val) {}
     body(val);
-    static bool isConstant(string command) {
-        string dotTrashed = command;
+    static bool isConstant(std::string command) {
+        std::string dotTrashed = command;
         ofStringReplace(dotTrashed, ".", "");
         if(1 < command.length() - dotTrashed.length()) {
             return false;
